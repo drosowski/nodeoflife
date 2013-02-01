@@ -1,4 +1,4 @@
-function Board() {
+var Board = function() {
 	this.population = [[0,0,0],[1,1,1],[0,0,0]];
 	this.evolve = function() {
 		var newPopulation = [];
@@ -68,6 +68,6 @@ function Board() {
 			console.log(rowStr);
 		}
 	}
-}
+};
 
-exports.board = new Board();
+module.exports = Board;
