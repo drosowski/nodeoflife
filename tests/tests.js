@@ -4,8 +4,8 @@ var board;
 QUnit.module( "CELL rule tests; cell with ...", {
 	setup: function() {
 		var Board = require('../board.js');
-		board = new Board();
-		board.population = [[0,0,0],[1,1,1],[0,0,0]];
+		board = new Board(3,3);
+		board.placeBlinker(0,1);
 	}
 });
 

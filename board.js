@@ -1,5 +1,35 @@
-var Board = function() {
-	this.population = [[0,0,0],[1,1,1],[0,0,0]];
+var Board = function(height, width) {
+	this.height = height;
+	this.width = width;
+	this.population = [];
+
+	for(var y = 0; y < height; y++) {
+		var row = [];	
+		for(var x = 0; x < width; x++) {
+			row.push(0);
+		}
+		this.population.push(row);
+	}	
+
+	this.placeBlinker = function(x, y) {
+		this.population[y][x] = 1;	
+		this.population[y][x+1] = 1;	
+		this.population[y][x+2] = 1;	
+	}
+
+	this.placeLWS = function(x, y) {
+		this.population[y][x+1] = 1;
+		this.population[y][x+2] = 1;
+		this.population[y][x+3] = 1;
+		this.population[y][x+4] = 1;
+
+		this.population[y+1][x] = 1;
+		this.population[y+1][x+4] = 1;
+		this.population[y+2][x+4] = 1;
+		this.population[y+3][x] = 1;
+		this.population[y+3][x+3] = 1;
+	}
+
 	this.evolve = function() {
 		var newPopulation = [];
 		var currentRow, currentColumn = 0;
@@ -14,7 +44,8 @@ var Board = function() {
 		}
 
 		this.population = newPopulation;
-	};
+	}
+
 	this.cellDestiny = function(x, y) {
 		var currentCell = this.population[y][x];
 		
@@ -57,7 +88,8 @@ var Board = function() {
 				return 0;
 			}
 		}
-	};
+	}
+
 	this.print = function() {
                 for(var row = 0; row < this.population.length; row++) {
 			var rowStr = "";
@@ -67,6 +99,7 @@ var Board = function() {
 			}
 			console.log(rowStr);
 		}
+		console.log("");
 	}
 };
 
