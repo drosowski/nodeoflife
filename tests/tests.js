@@ -5,6 +5,7 @@ QUnit.module( "CELL rule tests; cell with ...", {
 	setup: function() {
 		var Board = require('../board.js');
 		board = new Board();
+		board.population = [[0,0,0],[1,1,1],[0,0,0]];
 	}
 });
 
