@@ -19,3 +19,14 @@ test("...LESS THAN TWO neighbours DIES", function() {
 	deepEqual(board.population, [[0,0,0],[0,0,0],[0,0,0]]);
 });
 
+test("...TWO OR THREE neighbours LIVES", function() {
+	board.population = [[0,1,0],[1,1,0],[0,0,0]];
+	board.evolve();
+	deepEqual(board.population, [[1,1,0],[1,1,0],[0,0,0]]);
+});
+
+test("...MORE THAN THREE neighbours DIES", function() {
+	board.population = [[1,1,1],[1,1,1],[0,0,0]];
+	board.evolve();
+	deepEqual(board.population, [[1,0,1],[1,0,1],[0,1,0]]);
+});
