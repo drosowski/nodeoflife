@@ -1,0 +1,90 @@
+<html>
+<head>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/bonsai/0.4/bonsai.min.js"></script>
+	<script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
+	<style>
+		#board {
+			float: left;
+		}
+	</style>
+</head>
+<body>
+	<div id="board"></div>
+	
+	<div id="settings">
+		<div>
+			<label for="size">Size of the board</label>
+			<input type="text" name="width" id="width" value="32">x
+			<input type="text" name="height" id="height" value="32">
+		</div>
+		<p/>
+		<input type="button" onclick="initGrid($('#width').val(), $('#height').val());" value="Resize">
+
+		<p/>
+		<div>
+			<label for="size">Round time (ms)</label>
+			<input type="text" name="time" id="time" value="500">
+		</div>
+		<p/>
+		<input type="button" onclick="startGame($('#time').val());" value="Start">
+	</div>
+
+        <script type="text/javascript">
+
+	function startGame(time) {
+	window.setInterval(function() {	
+		$.getJSON('population.json?id={{ uuid }}', function(population) {		
+			window.grid.sendMessage("evolve", population);
+		});
+	}, time);
+	};
+
+	function initGrid(width, height) {
+		// reset previous grid
+		$('#board').html("");
+
+		window.grid = bonsai.run(document.getElementById("board"), { code: function() {
+				var step = 10;
+
+				stage.on('message:evolve', function(population) {
+					for(var i = 0; i < population.length; i++) {
+					for(var j = 0; j < population[i].length; j++) {
+					var fill = (population[i][j] == 1);
+					if(fill) {
+					new Rect(i * step, j * step, step, step).fill("black").addTo(stage);
+					}
+					else {
+					new Rect(i * step, j * step, step, step).fill("white").stroke("gray", 1).addTo(stage);
+					}
+					}
+					}
+					});
+
+				stage.on('message:init', function(dimension) {
+					console.log(dimension.height + " " + dimension.width);
+					for(var i = 0; i < dimension.height; i++) {
+					for(var j = 0; j < dimension.width; j++) {
+					new Rect(j * step, i * step, step, step).fill("white").stroke("gray", 1).addTo(stage);
+					}
+					}
+					});
+
+				stage.sendMessage('ready', {});
+			},
+			height: 640,
+			width: 640
+		});
+
+		window.grid.on('load', function() {
+				grid.on('message:ready', function() {
+					grid.sendMessage('init', {height: height, width: width});
+					});
+				});
+	}
+
+	$(document).ready(function() {
+		initGrid($('#width').val(), $('#height').val());
+	});
+	</script>
+</body>
+</html>
