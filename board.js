@@ -91,15 +91,7 @@ var Board = function(height, width) {
 	}
 
 	this.print = function() {
-                for(var row = 0; row < this.population.length; row++) {
-			var rowStr = "";
-                        for(var col = 0; col < this.population[row].length; col++) {
-				var cellValue = this.population[row][col];
-				rowStr = rowStr + " " + cellValue;
-			}
-			console.log(rowStr);
-		}
-		console.log("");
+		return JSON.stringify(this.population);
 	}
 };
 
