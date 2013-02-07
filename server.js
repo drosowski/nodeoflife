@@ -1,46 +1,57 @@
 var sys = require('sys');
 var http = require('http');
+var uuidGen = require('node-uuid');
+var swig  = require('swig');
 
 var Board = require('./board.js');
-var sessions = {};
 
-var swig  = require('swig');
 swig.init({
   autoescape: false,
   root: '.'
 });
-
-var uuidGen = require('node-uuid');
-
 var tmpl = swig.compileFile('/Users/danielrosowski/Development/spielwiese/gameoflife/js/index.html');
 
+var sessions = {};
+
 http.createServer(function (req, res) {
+	// startgame sets board dimension and starts the game
+	if(urlContains(req, 'startgame')) {
+		var width = parseParam(req, "width");
+		var height = parseParam(req, "height");
+		var id = parseParam(req, "id");
+
+		var board = new Board(width, height);
+		board.placeLWS(5,5);
+		sessions[id] = board;
+	}
 	// subsequent requests evolving the board
-	if(req.url.indexOf('population.json') > -1) {
-		var id = require('url').parse(req.url, true).query.id
+	else if(urlContains(req, 'population.json')) {
+		var id = parseParam(req, "id");
 		sessions[id].evolve();
 		res.writeHead(200, {'Content-Type': 'text/json'});
 		res.write(sessions[id].print());
 		res.end();
 	}
-	// initial request building a board and creating a new session
+	// initial request starting new pseudo session
 	else {
 		res.writeHead(200, {'Content-Type': 'text/html'});
 
-		var board = new Board(20,20);
-		board.placeLWS(5,5);
 		var uuid = uuidGen.v4();
-
 		var renderedHtml = tmpl.render({
-			population: board.print(),
 			uuid: uuid
 		});
 
 		res.write(renderedHtml);
 		res.end();
-		
-		sessions[uuid] = board;
 	}
 }).listen(9090);
 sys.puts("Server running...");
 
+function parseParam(request, name) {
+	var param = require('url').parse(request.url, true).query[name];
+	return param;
+}
+
+function urlContains(request, string) {
+	return (request.url.indexOf(string) > -1);
+}

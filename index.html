@@ -32,11 +32,20 @@
         <script type="text/javascript">
 
 	function startGame(time) {
-	window.setInterval(function() {	
-		$.getJSON('population.json?id={{ uuid }}', function(population) {		
-			window.grid.sendMessage("evolve", population);
+		var width = $('#width').val(); 
+		var height = $('#height').val();
+
+		$.ajax({
+			type: "GET",
+			url: "startgame",
+			data: { width: width, height: height, id: "{{uuid}}" }
 		});
-	}, time);
+
+		window.setInterval(function() {	
+			$.getJSON('population.json?id={{ uuid }}', function(population) {		
+				window.grid.sendMessage("evolve", population);
+			});
+		}, time);
 	};
 
 	function initGrid(width, height) {
