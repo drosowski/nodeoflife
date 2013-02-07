@@ -1,6 +1,6 @@
 <html>
 <head>
-	<script src="http://cdnjs.cloudflare.com/ajax/libs/bonsai/0.4/bonsai.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
 	<script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
 	<style>
 		#board {
@@ -43,52 +43,43 @@
 
 		window.setInterval(function() {	
 			$.getJSON('population.json?id={{ uuid }}', function(population) {		
-				window.grid.sendMessage("evolve", population);
+				fillGrid(population);	
 			});
 		}, time);
 	};
 
 	function initGrid(width, height) {
-		// reset previous grid
 		$('#board').html("");
+		var grid = Raphael('board', width * 10, height * 10);
 
-		window.grid = bonsai.run(document.getElementById("board"), { code: function() {
-				var step = 10;
+		var step = 10;
+		for(var i = 0; i < height; i++) {
+			for(var j = 0; j < width; j++) {
+				var rect = grid.rect(j * step, i * step, step, step);
+				rect.attr("stroke-width", 0.1);
+			}
+		}
+	}
 
-				stage.on('message:evolve', function(population) {
-					for(var i = 0; i < population.length; i++) {
-					for(var j = 0; j < population[i].length; j++) {
-					var fill = (population[i][j] == 1);
-					if(fill) {
-					new Rect(i * step, j * step, step, step).fill("black").addTo(stage);
-					}
-					else {
-					new Rect(i * step, j * step, step, step).fill("white").stroke("gray", 1).addTo(stage);
-					}
-					}
-					}
-					});
+	function fillGrid(population) {
+		$('#board').html("");
+		var grid = Raphael('board', width * 10, height * 10);
 
-				stage.on('message:init', function(dimension) {
-					console.log(dimension.height + " " + dimension.width);
-					for(var i = 0; i < dimension.height; i++) {
-					for(var j = 0; j < dimension.width; j++) {
-					new Rect(j * step, i * step, step, step).fill("white").stroke("gray", 1).addTo(stage);
-					}
-					}
-					});
-
-				stage.sendMessage('ready', {});
-			},
-			height: 640,
-			width: 640
-		});
-
-		window.grid.on('load', function() {
-				grid.on('message:ready', function() {
-					grid.sendMessage('init', {height: height, width: width});
-					});
-				});
+		var step = 10;
+		for(var i = 0; i < population.length; i++) {
+			for(var j = 0; j < population[i].length; j++) {
+				var fill = (population[i][j] == 1);
+				if(fill) {
+					var rect = grid.rect(j * step, i * step, step, step);
+					rect.attr("stroke-width", 0.1);
+					rect.attr("fill", "black");
+				}
+				else {
+					var rect = grid.rect(j * step, i * step, step, step);
+					rect.attr("stroke-width", 0.1);
+				}
+			}
+		}
 	}
 
 	$(document).ready(function() {
