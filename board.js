@@ -30,6 +30,12 @@ var Board = function(height, width) {
 		this.population[y+3][x+3] = 1;
 	}
 
+	this.markLiving = function(livingCells) {
+		for(var i = 0; i < livingCells.length; i++) {
+			this.population[livingCells[i].y][livingCells[i].x] = 1;
+		}
+	}
+
 	this.evolve = function() {
 		var newPopulation = [];
 		var currentRow, currentColumn = 0;

@@ -31,6 +31,8 @@
 
         <script type="text/javascript">
 
+	var livingCells = [];
+
 	function startGame(time) {
 		var width = $('#width').val(); 
 		var height = $('#height').val();
@@ -38,7 +40,7 @@
 		$.ajax({
 			type: "GET",
 			url: "startgame",
-			data: { width: width, height: height, id: "{{uuid}}" }
+			data: { width: width, height: height, id: "{{uuid}}", livingCells: joinLivingCells() }
 		});
 
 		window.setInterval(function() {	
@@ -48,6 +50,20 @@
 		}, time);
 	};
 
+	function joinLivingCells() {
+		var livingCellsString = "";
+		for(var i = 0; i < livingCells.length; i++) {
+			livingCellsString += livingCells[i].x;
+			livingCellsString += ".";
+			livingCellsString += livingCells[i].y;
+			if(i + 1 < livingCells.length) {
+				livingCellsString += "-";
+			}
+		}
+
+		return livingCellsString;
+	}
+
 	function initGrid(width, height) {
 		$('#board').html("");
 		var grid = Raphael('board', width * 10, height * 10);
@@ -55,8 +71,28 @@
 		var step = 10;
 		for(var i = 0; i < height; i++) {
 			for(var j = 0; j < width; j++) {
-				var rect = grid.rect(j * step, i * step, step, step);
-				rect.attr("stroke-width", 0.1);
+				var x = j * step;
+				var y = i * step;
+
+				var rect = grid.rect(x, y, step, step);
+				rect.attr("stroke-width", 0.1)
+					.data("x", j)
+					.data("y", i)
+					.attr("fill", "white")
+					.click(function() {
+						if(this.attr("fill") == "white") {
+							livingCells.push({ x: this.data("x"), y: this.data("y") });
+							this.attr("fill", "black");
+						}
+						else {
+							for(var i = 0; i < livingCells.length; i++) {
+								if(livingCells[i].x == this.data("x") && livingCells[i].y == this.data("y")) {
+									livingCells.splice(i, 1);
+								}
+							}
+							this.attr("fill", "white");
+						}
+				});
 			}
 		}
 	}
@@ -70,13 +106,14 @@
 			for(var j = 0; j < population[i].length; j++) {
 				var fill = (population[i][j] == 1);
 				if(fill) {
-					var rect = grid.rect(j * step, i * step, step, step);
-					rect.attr("stroke-width", 0.1);
-					rect.attr("fill", "black");
+					var rect = grid.rect(j * step, i * step, step, step)
+						.attr("stroke-width", 0.1)
+						.attr("fill", "black");
 				}
 				else {
-					var rect = grid.rect(j * step, i * step, step, step);
-					rect.attr("stroke-width", 0.1);
+					var rect = grid.rect(j * step, i * step, step, step)
+						.attr("stroke-width", 0.1)
+						.attr("fill", "white");
 				}
 			}
 		}

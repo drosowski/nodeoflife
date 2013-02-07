@@ -19,9 +19,10 @@ http.createServer(function (req, res) {
 		var width = parseParam(req, "width");
 		var height = parseParam(req, "height");
 		var id = parseParam(req, "id");
+		var livingCells = parseLivingCells(parseParam(req, "livingCells"));
 
 		var board = new Board(width, height);
-		board.placeLWS(5,5);
+		board.markLiving(livingCells);
 		sessions[id] = board;
 	}
 	// subsequent requests evolving the board
@@ -54,4 +55,17 @@ function parseParam(request, name) {
 
 function urlContains(request, string) {
 	return (request.url.indexOf(string) > -1);
+}
+
+function parseLivingCells(livingCellsString) {
+	var livingCells = [];
+
+	if(livingCellsString) {
+		var pairs = livingCellsString.split("-");
+		for(var i = 0; i < pairs.length; i++) {
+			var pair = pairs[i].split(".");
+			livingCells.push({ x: pair[0], y: pair[1] });
+		}		
+	}
+	return livingCells;
 }
