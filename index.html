@@ -26,14 +26,16 @@
 			<input type="text" name="time" id="time" value="500">
 		</div>
 		<p/>
-		<input type="button" onclick="startGame($('#time').val());" value="Start">
+		<input type="button" onclick="startGame();" value="Start">
+		<input type="button" onclick="stopGame();" value="Stop">
+		<input type="button" onclick="pauseGame();" value="Pause">
 	</div>
 
         <script type="text/javascript">
 
 	var livingCells = [];
 
-	function startGame(time) {
+	function startGame() {
 		var width = $('#width').val(); 
 		var height = $('#height').val();
 
@@ -43,12 +45,32 @@
 			data: { width: width, height: height, id: "{{uuid}}", livingCells: joinLivingCells() }
 		});
 
-		window.setInterval(function() {	
-			$.getJSON('population.json?id={{ uuid }}', function(population) {		
-				fillGrid(population);	
-			});
-		}, time);
-	};
+		startGameTimer();
+	}
+
+	function startGameTimer() {
+		var time = $('#time').val();
+		window.gameTimer = setInterval(function() {	
+				$.getJSON('population.json?id={{ uuid }}', function(population) {		
+					fillGrid(population);	
+					});
+				}, time);
+	}
+
+	function stopGame() {
+		clearInterval(window.gameTimer);
+		initGrid($('#width').val(), $('#height').val());
+	}
+
+	function pauseGame() {
+		if(window.gameTimer) {
+			clearInterval(window.gameTimer);
+			window.gameTimer = false;
+		}
+		else {
+			startGameTimer();
+		}
+	}	
 
 	function joinLivingCells() {
 		var livingCellsString = "";
