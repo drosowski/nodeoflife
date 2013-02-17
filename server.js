@@ -1,4 +1,5 @@
 var sys = require('sys');
+var fs = require('fs');
 var http = require('http');
 var uuidGen = require('node-uuid');
 var swig  = require('swig');
@@ -32,6 +33,19 @@ http.createServer(function (req, res) {
 		res.writeHead(200, {'Content-Type': 'text/json'});
 		res.write(sessions[id].print());
 		res.end();
+	}
+	// serve static js file
+	else if(urlContains(req, 'grid.js')) {
+		fs.readFile('grid.js', function(error, content) {
+                	if (error) {
+                		res.writeHead(500);
+                		res.end();
+                	}
+                	else {
+				res.writeHead(200, {'Content-Type': 'text/javascript'});
+				res.end(content);
+                	}
+            	});
 	}
 	// initial request starting new pseudo session
 	else {

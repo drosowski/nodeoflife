@@ -32,7 +32,7 @@ var Board = function(height, width) {
 
 	this.markLiving = function(livingCells) {
 		for(var i = 0; i < livingCells.length; i++) {
-			this.population[livingCells[i].y][livingCells[i].x] = 1;
+			this.population[livingCells[i].x][livingCells[i].y] = 1;
 		}
 	}
 
