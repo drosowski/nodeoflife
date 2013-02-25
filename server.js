@@ -4,15 +4,21 @@ var http = require('http');
 var uuidGen = require('node-uuid');
 var swig  = require('swig');
 
-var Board = require('./board.js');
+var Board = require('./include/board.js');
 
 swig.init({
   autoescape: false,
   root: '.'
 });
-var tmpl = swig.compileFile('/Users/danielrosowski/Development/spielwiese/gameoflife/js/index.html');
+var tmpl = swig.compileFile('./www/index.html');
 
 var sessions = {};
+
+var port = process.argv[2];
+if(!port) {
+	sys.puts("Usage: node server.js <port>");
+	process.exit(1);
+}
 
 http.createServer(function (req, res) {
 	// startgame sets board dimension and starts the game
@@ -36,7 +42,7 @@ http.createServer(function (req, res) {
 	}
 	// serve static js file
 	else if(urlContains(req, 'grid.js')) {
-		fs.readFile('grid.js', function(error, content) {
+		fs.readFile('www/js/grid.js', function(error, content) {
                 	if (error) {
                 		res.writeHead(500);
                 		res.end();
@@ -59,8 +65,8 @@ http.createServer(function (req, res) {
 		res.write(renderedHtml);
 		res.end();
 	}
-}).listen(9090);
-sys.puts("Server running...");
+}).listen(port);
+sys.puts("Server listening on " + port + "...");
 
 function parseParam(request, name) {
 	var param = require('url').parse(request.url, true).query[name];

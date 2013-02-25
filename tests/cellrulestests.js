@@ -1,9 +1,8 @@
-var Board = require('../board.js');
 var board;
 
 QUnit.module( "CELL rule tests; cell with ...", {
 	setup: function() {
-		var Board = require('../board.js');
+		var Board = require('../include/board.js');
 		board = new Board(3,3);
 		board.placeBlinker(0,1);
 	}
