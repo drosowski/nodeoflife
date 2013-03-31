@@ -1,4 +1,4 @@
-var Board = function(height, width) {
+var Board = function(width, height) {
 	this.height = height;
 	this.width = width;
 	this.population = [];
@@ -12,27 +12,26 @@ var Board = function(height, width) {
 	}	
 
 	this.placeBlinker = function(x, y) {
-		this.population[y][x] = 1;	
-		this.population[y][x+1] = 1;	
-		this.population[y][x+2] = 1;	
+		this.activateCell(x, y);
+		this.activateCell(x, y+1);
+		this.activateCell(x, y+2);
 	}
 
-	this.placeLWS = function(x, y) {
-		this.population[y][x+1] = 1;
-		this.population[y][x+2] = 1;
-		this.population[y][x+3] = 1;
-		this.population[y][x+4] = 1;
+	this.getCell = function(x, y) {
+		if(y >= 0 && y < this.population.length && x >= 0 && x < this.population.length) {
+			return this.population[x][y];
+		}
+		
+		return 0;
+	}
 
-		this.population[y+1][x] = 1;
-		this.population[y+1][x+4] = 1;
-		this.population[y+2][x+4] = 1;
-		this.population[y+3][x] = 1;
-		this.population[y+3][x+3] = 1;
+	this.activateCell = function(x, y) {
+		this.population[x][y] = 1;
 	}
 
 	this.markLiving = function(livingCells) {
 		for(var i = 0; i < livingCells.length; i++) {
-			this.population[livingCells[i].x][livingCells[i].y] = 1;
+			this.activateCell(livingCells[i].x, livingCells[i].y);
 		}
 	}
 
@@ -43,7 +42,7 @@ var Board = function(height, width) {
 		for(var row = 0; row < this.population.length; row++) {
 			var newRow = [];
 			for(var col = 0; col < this.population[row].length; col++) {
-				var newCell = this.cellDestiny(col, row);
+				var newCell = this.cellDestiny(row, col);
 				newRow.push(newCell);
 			}
 			newPopulation.push(newRow);
@@ -53,28 +52,20 @@ var Board = function(height, width) {
 	}
 
 	this.cellDestiny = function(x, y) {
-		var currentCell = this.population[y][x];
+		var currentCell = this.getCell(x, y);
 		
 		var cellValues = [];
 		// the neighbour cells from upper left (y-1, x-1) to lower right (y+1, x+1)
-		if(y > 0 && x > 0) {
-			cellValues.push(this.population[y-1][x-1]);
-		}
-		if(y > 0) {
-			cellValues.push(this.population[y-1][x]);
-			cellValues.push(this.population[y-1][x+1]);
-		}
-		if(x > 0) {
-			cellValues.push(this.population[y][x-1]);
-			if(y+1 < this.population.length) {
-				cellValues.push(this.population[y+1][x-1]);
-			}
-		}
-		cellValues.push(this.population[y][x+1]);
-		if(y+1 < this.population.length) {
-			cellValues.push(this.population[y+1][x]);
-			cellValues.push(this.population[y+1][x+1]);
-		}
+		cellValues.push(this.getCell(x-1, y-1));
+		cellValues.push(this.getCell(x, y-1));
+		cellValues.push(this.getCell(x+1, y-1));
+
+		cellValues.push(this.getCell(x-1, y));
+		cellValues.push(this.getCell(x+1, y));
+
+		cellValues.push(this.getCell(x-1, y+1));
+		cellValues.push(this.getCell(x, y+1));
+		cellValues.push(this.getCell(x+1, y+1));
 
 		var livingCellCount = cellValues.filter(function(value) { return value == 1 }).length;
 
@@ -98,6 +89,10 @@ var Board = function(height, width) {
 
 	this.print = function() {
 		return JSON.stringify(this.population);
+	}
+
+	this.debug = function() {
+		console.log(this.population);
 	}
 };
 

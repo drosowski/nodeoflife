@@ -4,7 +4,7 @@ QUnit.module( "CELL rule tests; cell with ...", {
 	setup: function() {
 		var Board = require('../include/board.js');
 		board = new Board(3,3);
-		board.placeBlinker(0,1);
+		board.placeBlinker(1,0);
 	}
 });
 
@@ -14,7 +14,7 @@ test("...EXACTLY THREE neighbours REVIVES", function() {
 });
 
 test("...LESS THAN TWO neighbours DIES", function() {
-	board.population = [[0,0,0],[0,1,0],[0,1,0]];
+	board.population = [[0,0,0],[0,1,0],[0,0,0]];
 	board.evolve();
 	deepEqual(board.population, [[0,0,0],[0,0,0],[0,0,0]]);
 });
